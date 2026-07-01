@@ -1,30 +1,27 @@
 
-<!-- saved from url=(0052)file:///C:/Users/ymori/Downloads/bakugai_card_4.html -->
+<!-- saved from url=(0052)file:///C:/Users/ymori/Downloads/bakugai_card_6.html -->
 <html><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>爆買カード 演出</title>
 <style>
   :root{
     --gold-hi:#FFF6C4; --gold:#FFD23F; --gold-mid:#FFB800; --gold-deep:#F59E0B; --gold-dark:#B8860B;
-    --brown:#5a2600; --red:#E23A28; --red-dk:#B12417; --cheek:#FF9AA2;
-    --bg0:#1c1206; --bg1:#0b0703;
+    --brown:#5a2600; --red:#E23A28; --red-dk:#B12417; --cheek:#FF9AA2; --bg0:#1c1206; --bg1:#0b0703;
   }
   *{box-sizing:border-box}
   html,body{margin:0;height:100%;background:#000;overflow:hidden;
     font-family:"Hiragino Sans","Hiragino Kaku Gothic ProN","Yu Gothic","Noto Sans JP","Meiryo",system-ui,sans-serif;}
-  #stage{position:relative;width:100%;height:100dvh;overflow:hidden;
+  #stage{position:relative;width:100%;height:100dvh;overflow:hidden;cursor:pointer;
     background:radial-gradient(120% 90% at 50% 40%,#2a1a0a 0%,var(--bg0) 42%,var(--bg1) 100%);
-    display:flex;align-items:center;justify-content:center;
-    user-select:none;-webkit-user-select:none;touch-action:manipulation;}
+    display:flex;align-items:center;justify-content:center;user-select:none;-webkit-user-select:none;touch-action:manipulation;}
 
-  .rays{position:absolute;inset:-30%;pointer-events:none;opacity:.32;
+  .rays{position:absolute;inset:-30%;pointer-events:none;opacity:.3;
     background:repeating-conic-gradient(from 0deg at 50% 46%,rgba(255,210,80,.16) 0deg 6deg,transparent 6deg 16deg);
     animation:spin 40s linear infinite;filter:blur(1px);}
-  .rays.b{opacity:.16;animation-duration:70s;animation-direction:reverse}
+  .rays.b{opacity:.15;animation-duration:70s;animation-direction:reverse}
   @keyframes spin{to{transform:rotate(360deg)}}
-  .vignette{position:absolute;inset:0;pointer-events:none;box-shadow:inset 0 0 40vmin 10vmin rgba(0,0,0,.72);}
+  .vignette{position:absolute;inset:0;pointer-events:none;box-shadow:inset 0 0 40vmin 10vmin rgba(0,0,0,.7);}
 
-  /* explosion flash + rainbow shockwave */
   #flash{position:absolute;inset:0;background:#fff;opacity:0;pointer-events:none;z-index:60;}
   #flash.boom{animation:flash .7s ease-out both;}
   @keyframes flash{0%{opacity:0}8%{opacity:1}100%{opacity:0}}
@@ -36,94 +33,76 @@
   #shock.go{animation:shock .8s cubic-bezier(.15,.7,.2,1) both;}
   @keyframes shock{0%{opacity:.95;transform:scale(.2)}100%{opacity:0;transform:scale(9)}}
 
-  /* big banner text (激アツ / リアルカード確定) */
-  #banner{position:absolute;top:9%;left:0;right:0;text-align:center;z-index:55;pointer-events:none;
-    font-size:min(11vw,7rem);font-weight:900;color:#fff;opacity:0;
-    -webkit-text-stroke:.9vmin var(--red-dk);paint-order:stroke fill;
-    text-shadow:0 .6vmin 0 var(--red-dk),0 0 4vmin #ff2a12;letter-spacing:.04em;}
-  #banner.show{animation:pop2 1s cubic-bezier(.2,1.4,.3,1) both;}
-  @keyframes pop2{0%{opacity:0;transform:scale(.3) rotate(-8deg)}30%{opacity:1;transform:scale(1.08) rotate(-4deg)}
-    78%{opacity:1;transform:scale(1) rotate(-4deg)}100%{opacity:0;transform:scale(1.05) rotate(-4deg)}}
+  /* ---------- dialogue window (桃鉄風メッセージ枠) ---------- */
+  #dialogue{position:absolute;top:7%;left:4%;right:4%;z-index:45;pointer-events:none;
+    opacity:0;transform:translateY(-1.2vmin);transition:opacity .25s,transform .25s;
+    padding:3vmin 4vmin 3.6vmin;border-radius:2.4vmin;
+    background:linear-gradient(180deg,rgba(232,242,255,.9),rgba(206,224,250,.86));
+    border:.5vmin solid rgba(255,255,255,.8);box-shadow:0 1.6vmin 3vmin rgba(0,0,0,.45),inset 0 0 0 .3vmin rgba(120,160,220,.35);}
+  #dialogue.show{opacity:1;transform:none;}
+  #dlgText{color:#16305e;font-weight:900;font-size:min(5.4vmin,26px);line-height:1.55;text-shadow:0 1px 0 rgba(255,255,255,.7);}
+  #dialogue .adv{position:absolute;right:2.4vmin;bottom:1vmin;color:#e0a012;font-size:4.4vmin;
+    animation:blink 1s steps(1) infinite;filter:drop-shadow(0 .2vmin 0 #7a4a00);}
+  @keyframes blink{50%{opacity:.15}}
+  #dialogue .hint{position:absolute;right:3vmin;bottom:.4vmin;font-size:min(2.6vmin,12px);color:#3a5a92;font-weight:800;opacity:.75;}
 
-  /* ---------------- ROULETTE ---------------- */
-  #roulette{position:absolute;z-index:20;display:flex;flex-direction:column;align-items:center;gap:4vmin;}
-  #roulette.hide{animation:rgone .45s ease-in forwards;pointer-events:none;}
-  @keyframes rgone{to{opacity:0;transform:scale(.82)}}
-  .machine{position:relative;padding:3vmin;border-radius:4vmin;
+  /* ---------- roulette (横長ペール型) ---------- */
+  #roulette{position:absolute;z-index:20;opacity:0;pointer-events:none;transition:opacity .4s;}
+  #roulette.show{opacity:1;}
+  .pill{position:relative;width:min(90vmin,640px);padding:2.4vmin;border-radius:99px;
     background:conic-gradient(from 45deg,#8a4a12,#e6a83a,#fff4c2,#e6a83a,#8a4a12,#e6a83a,#fff4c2,#e6a83a,#8a4a12);
     box-shadow:0 3vmin 4vmin rgba(0,0,0,.55),inset 0 0 0 .5vmin rgba(255,240,190,.45);}
-  .reel-window{position:relative;width:min(64vmin,360px);height:min(60vmin,342px);overflow:hidden;
-    border-radius:2.4vmin;background:#160b04;box-shadow:inset 0 0 4vmin rgba(0,0,0,.85);}
+  .pill .leg{position:absolute;bottom:-2.2vmin;width:6vmin;height:3vmin;z-index:-1;
+    background:linear-gradient(#e6a83a,#8a4a12);border-radius:0 0 1.4vmin 1.4vmin;box-shadow:0 1vmin 1.4vmin rgba(0,0,0,.4);}
+  .pill .leg.l{left:18%}.pill .leg.r{right:18%}
+  .reel-window{position:relative;width:100%;height:min(28vmin,150px);overflow:hidden;border-radius:6vmin;
+    background:#16100a;box-shadow:inset 0 0 4vmin rgba(0,0,0,.9);}
   #strip{position:absolute;left:0;right:0;top:0;will-change:transform;}
-  .tile{display:flex;align-items:center;justify-content:center;gap:1.6vmin;box-sizing:border-box;
-    border-bottom:.3vmin solid rgba(0,0,0,.35);font-weight:900;font-size:min(4.8vmin,24px);color:var(--brown);
-    background:linear-gradient(#ffe9a8,#f4c65a 60%,#e0a63a);padding:0 3vmin;line-height:1.1;}
-  .tile .dot{width:3.2vmin;height:3.2vmin;border-radius:50%;flex:0 0 auto;
-    background:radial-gradient(circle at 35% 30%,#fff6c4,#ffd23f 55%,#c98a1c);box-shadow:inset 0 0 0 .3vmin #a86c14;}
-  .tile.real{color:#fff;background:linear-gradient(#ffd23f,#ff8a3c 50%,#e23a28);
-    text-shadow:0 .3vmin 0 #7a1409;box-shadow:inset 0 0 3vmin rgba(255,255,255,.55);}
-  .tile.real .dot{background:radial-gradient(circle at 35% 30%,#fff,#ffd23f 55%,#e0a012);}
-  .tile.bonbi{color:#fff;background:linear-gradient(#5b6bd6,#3a3f9e 55%,#22224f);text-shadow:0 .3vmin 0 #12123a;}
-  .tile.bonbi .dot{background:radial-gradient(circle at 35% 30%,#dfe4ff,#8f9bff 55%,#3a3f9e);box-shadow:inset 0 0 0 .3vmin #2a2f7a;}
-  .reel-hi{position:absolute;left:0;right:0;top:33.34%;height:33.33%;pointer-events:none;z-index:4;
-    border-radius:1.6vmin;box-shadow:0 0 0 .5vmin var(--gold),0 0 5vmin var(--gold-mid);}
-  .reel-hi.win{animation:winflash .16s steps(1) 7;}
-  @keyframes winflash{50%{box-shadow:0 0 0 .7vmin #fff,0 0 8vmin #fff}}
-  .reel-mask{position:absolute;left:0;right:0;height:33.4%;pointer-events:none;z-index:2;}
-  .reel-mask.top{top:0;background:linear-gradient(#160b04,rgba(22,11,4,0));}
-  .reel-mask.bot{bottom:0;background:linear-gradient(rgba(22,11,4,0),#160b04);}
-  .reel-arrow{position:absolute;top:50%;transform:translateY(-50%);color:var(--gold);font-size:5vmin;z-index:5;
-    filter:drop-shadow(0 0 1vmin var(--gold-mid));}
-  .reel-arrow.l{left:-.6vmin}.reel-arrow.r{right:-.6vmin}
+  .tile{display:flex;align-items:center;justify-content:center;box-sizing:border-box;font-weight:900;
+    font-size:min(5.8vmin,30px);color:#fff;letter-spacing:.04em;text-shadow:0 .3vmin .5vmin rgba(0,0,0,.7);}
+  .tile.win{color:#ffe15a;text-shadow:0 0 2.4vmin #ffb800,0 .3vmin 0 #7a4a00;}
+  .tile.bonbi{color:#b7a7ff;text-shadow:0 0 2vmin #6a5bd0,0 .3vmin .5vmin rgba(0,0,0,.7);}
+  .reel-hi{position:absolute;left:0;right:0;top:33.34%;height:33.33%;pointer-events:none;z-index:3;
+    background:linear-gradient(rgba(255,255,255,.05),rgba(255,255,255,.13),rgba(255,255,255,.05));
+    box-shadow:inset 0 .28vmin 0 rgba(255,255,255,.3),inset 0 -.28vmin 0 rgba(255,255,255,.3);}
+  .reel-hi.win{animation:winflash .15s steps(1) 9;}
+  @keyframes winflash{50%{background:rgba(255,255,255,.6)}}
+  .reel-mask{position:absolute;left:0;right:0;height:33.5%;pointer-events:none;z-index:2;}
+  .reel-mask.top{top:0;background:linear-gradient(#16100a,rgba(22,16,10,0));}
+  .reel-mask.bot{bottom:0;background:linear-gradient(rgba(22,16,10,0),#16100a);}
+  .reel-shine{position:absolute;top:6%;bottom:6%;right:9%;width:2.4%;z-index:4;pointer-events:none;border-radius:2vmin;
+    background:linear-gradient(rgba(255,255,255,0),rgba(255,255,255,.95),rgba(255,255,255,0));filter:blur(.4vmin);
+    animation:shineY 2.6s ease-in-out infinite;}
+  @keyframes shineY{50%{opacity:.35}}
 
-  /* ---------------- OPENER (real card -> flip -> 爆買) ---------------- */
-  #opener{position:absolute;z-index:30;width:min(80vmin,440px);height:min(80vmin,440px);
-    perspective:1500px;opacity:0;pointer-events:none;display:flex;align-items:center;justify-content:center;}
+  /* ---------- カード獲得！ banner ---------- */
+  #getBanner{position:absolute;top:5%;left:0;right:0;text-align:center;z-index:52;pointer-events:none;opacity:0;
+    font-size:min(13vw,7rem);font-weight:900;letter-spacing:.02em;
+    background:linear-gradient(#fff3a0,#ffd23f 45%,#ffab2e);-webkit-background-clip:text;background-clip:text;
+    -webkit-text-fill-color:transparent;color:transparent;
+    filter:drop-shadow(0 0 .1vmin #6a3300) drop-shadow(0 .5vmin .2vmin rgba(50,20,0,.5));}
+  #getBanner::before{content:"カード獲得！";position:absolute;left:0;right:0;z-index:-1;
+    -webkit-text-stroke:1.5vmin #5a2600;color:#5a2600;}
+  #getBanner.show{animation:getin .8s cubic-bezier(.2,1.5,.3,1) both;}
+  @keyframes getin{0%{opacity:0;transform:translateY(-6vmin) scale(.6)}60%{opacity:1;transform:translateY(1vmin) scale(1.08)}100%{opacity:1;transform:translateY(0) scale(1)}}
+
+  /* ---------- 爆買 card reveal ---------- */
+  #opener{position:absolute;z-index:30;top:52%;transform:translateY(-46%);width:min(78vmin,430px);height:min(78vmin,430px);
+    opacity:0;pointer-events:none;display:flex;align-items:center;justify-content:center;}
   #opener.show{opacity:1;}
   #opener.idle{animation:float 4s ease-in-out infinite;}
-  @keyframes float{50%{transform:translateY(-1.4vmin)}}
+  @keyframes float{0%,100%{transform:translateY(-46%)}50%{transform:translateY(-49%)}}
   .aura{position:absolute;width:150%;height:150%;pointer-events:none;opacity:0;transition:opacity .5s;z-index:0;
     background:repeating-conic-gradient(from 0deg,rgba(255,225,120,.55) 0deg 5deg,transparent 5deg 12deg);
     -webkit-mask:radial-gradient(closest-side,#000 30%,transparent 72%);mask:radial-gradient(closest-side,#000 30%,transparent 72%);
     animation:spin 14s linear infinite;}
   .aura.b{animation-duration:22s;animation-direction:reverse;filter:hue-rotate(15deg);}
-  #opener.revealed .aura{opacity:.9}#opener.revealed .aura.b{opacity:.5}
-
-  #flip{position:relative;width:100%;height:100%;transform-style:preserve-3d;z-index:1;}
-  #flip.pop{animation:pop3 .5s cubic-bezier(.2,1.5,.3,1) both;}
-  @keyframes pop3{0%{transform:scale(.15) rotateY(0)}70%{transform:scale(1.08) rotateY(0)}100%{transform:scale(1) rotateY(0)}}
-  #flip.open{animation:openflip .62s ease-in-out forwards;}
-  @keyframes openflip{0%{transform:rotateY(0) scale(1)}45%{transform:rotateY(90deg) scale(1.18)}100%{transform:rotateY(180deg) scale(1)}}
-  .face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;
-    display:flex;align-items:center;justify-content:center;}
-  .face.front{transform:rotateY(180deg);}
+  #opener.show .aura{opacity:.9}#opener.show .aura.b{opacity:.5}
+  #opener.show .card{animation:cardpop .78s cubic-bezier(.2,1.45,.3,1) both;}
+  @keyframes cardpop{0%{transform:scale(.2) rotate(-12deg);filter:brightness(2.6)}60%{transform:scale(1.06) rotate(4deg);filter:brightness(1.2)}100%{transform:scale(1) rotate(0);filter:brightness(1)}}
 
   .oct{clip-path:polygon(29% 0,71% 0,100% 29%,100% 71%,71% 100%,29% 100%,0 71%,0 29%);}
-
-  /* real card (back) */
-  .rcard{position:relative;width:90%;height:90%;
-    background:conic-gradient(from 45deg,#6b1410,#c1392b,#f0c24e,#c1392b,#6b1410,#c1392b,#f0c24e,#c1392b,#6b1410);
-    padding:2.6%;filter:drop-shadow(0 3vmin 3vmin rgba(0,0,0,.55));}
-  .rcard .rframe{width:100%;height:100%;padding:5%;
-    background:linear-gradient(150deg,#7a1a14,#a8281e 45%,#5a120e);box-shadow:inset 0 0 0 .4vmin rgba(255,225,140,.5);}
-  .rcard .rinner{position:relative;width:100%;height:100%;overflow:hidden;
-    background:radial-gradient(120% 90% at 50% 40%,#a8281e,#7a150f 60%,#4a0d0a);
-    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2vmin;
-    box-shadow:inset 0 0 3vmin rgba(0,0,0,.5);}
-  .rcard .rinner::after{content:"";position:absolute;inset:-40%;
-    background:linear-gradient(115deg,transparent 40%,rgba(255,255,255,.5) 50%,transparent 60%);
-    animation:sheen 2.6s linear infinite;mix-blend-mode:screen;}
-  @keyframes sheen{to{transform:translateX(60%)}}
-  .rcard .medal{width:34%;aspect-ratio:1;border-radius:50%;display:flex;align-items:center;justify-content:center;
-    font-size:min(16vmin,80px);font-weight:900;color:#7a4a00;z-index:2;
-    background:radial-gradient(circle at 34% 28%,#fff6c4,#ffd23f 52%,#e0a012 82%,#a86c14);
-    box-shadow:inset 0 0 0 .6vmin #b57a10,0 0 4vmin rgba(255,200,80,.5);}
-  .rcard .rlabel{z-index:2;font-weight:900;font-size:min(6vmin,30px);color:#ffe9a8;letter-spacing:.14em;
-    text-shadow:0 .3vmin 0 #4a0d0a,0 0 3vmin #ffb800;}
-  .rcard .rsub{z-index:2;font-weight:900;font-size:min(3.4vmin,17px);color:#ffd23f;letter-spacing:.3em;opacity:.85;}
-
-  /* 爆買 card (front) */
-  .card{position:relative;width:90%;height:90%;
+  .card{position:relative;width:88%;height:88%;z-index:1;
     background:conic-gradient(from 45deg,#8a4a12,#e6a83a,#fff4c2,#e6a83a,#8a4a12,#e6a83a,#fff4c2,#e6a83a,#8a4a12);
     padding:2.4%;filter:drop-shadow(0 3vmin 3vmin rgba(0,0,0,.55));}
   .card .frame{width:100%;height:100%;padding:5.2%;
@@ -134,13 +113,10 @@
   .inner .bgcoin{position:absolute;border-radius:50%;opacity:.85;
     background:radial-gradient(circle at 35% 30%,#fff2b0,#ffcf49 55%,#c98a1c);
     box-shadow:inset 0 0 0 .3vmin #a86c14,0 .3vmin .4vmin rgba(90,45,0,.3);}
-
-  /* kanji: dark outlined base + gold gradient on top (fixes black-fill bug) */
   .kanji{position:absolute;font-weight:900;line-height:.9;z-index:5;
     color:var(--brown);-webkit-text-stroke:.7vmin var(--brown);paint-order:stroke fill;
     filter:drop-shadow(0 .5vmin .25vmin rgba(50,20,0,.5));}
-  .kanji::after{content:attr(data-c);position:absolute;left:0;top:0;pointer-events:none;
-    -webkit-text-stroke:0;
+  .kanji::after{content:attr(data-c);position:absolute;left:0;top:0;pointer-events:none;-webkit-text-stroke:0;
     background:linear-gradient(#fff6c4,#ffd23f 42%,#f59e0b 72%,#b8860b);
     -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent;}
   .kanji.top{top:3%;left:50%;transform:translateX(-50%);font-size:min(30vmin,150px);}
@@ -148,21 +124,12 @@
   .furi{position:absolute;left:50%;transform:translateX(-50%);z-index:6;font-size:min(5.4vmin,26px);font-weight:900;
     color:#fff;-webkit-text-stroke:.6vmin var(--red-dk);paint-order:stroke fill;letter-spacing:.12em;}
   .furi.top{top:2%}.furi.bot{bottom:.5%}
-
   #mascot{position:absolute;left:50%;top:50%;transform:translate(-50%,-48%);width:46%;z-index:4;
     filter:drop-shadow(0 1vmin .8vmin rgba(90,45,0,.35));}
   #mascot .coin-spin{transform-box:fill-box;transform-origin:center;animation:coinbob 1.6s ease-in-out infinite;}
   @keyframes coinbob{50%{transform:translateY(-3px) rotate(-6deg)}}
-  .glint{position:absolute;color:#fff;z-index:7;pointer-events:none;filter:drop-shadow(0 0 1vmin #fff);
-    animation:tw 2.2s ease-in-out infinite;}
+  .glint{position:absolute;color:#fff;z-index:7;pointer-events:none;filter:drop-shadow(0 0 1vmin #fff);animation:tw 2.2s ease-in-out infinite;}
   @keyframes tw{0%,100%{opacity:.2;transform:scale(.6)}50%{opacity:1;transform:scale(1)}}
-
-  #kakutei{position:absolute;z-index:50;opacity:0;pointer-events:none;font-size:min(15vw,9rem);font-weight:900;color:#fff;
-    letter-spacing:.04em;-webkit-text-stroke:1.1vmin var(--red-dk);paint-order:stroke fill;
-    text-shadow:0 0 5vmin #ff2a12,0 .7vmin 0 var(--red-dk);}
-  #kakutei.show{animation:kt 2.4s cubic-bezier(.2,1.6,.3,1) both;}
-  @keyframes kt{0%{opacity:0;transform:scale(2) rotate(12deg)}18%{opacity:1;transform:scale(1) rotate(-6deg)}
-    82%{opacity:1;transform:scale(1) rotate(-6deg)}100%{opacity:0;transform:scale(1.1) rotate(-6deg)}}
 
   #fx{position:absolute;inset:0;pointer-events:none;z-index:45;overflow:hidden;}
   .coin{position:absolute;width:5vmin;height:5vmin;border-radius:50%;will-change:transform;display:flex;align-items:center;
@@ -175,161 +142,130 @@
     justify-content:center;font-weight:900;color:#7a4a00;font-size:2vmin;opacity:.9;will-change:transform;
     background:radial-gradient(circle at 34% 28%,#fff6c4,#ffd23f 52%,#e0a012 80%,#a86c14);box-shadow:inset 0 0 0 .3vmin #b57a10;}
 
-  /* UI */
-  .bigbtn{position:absolute;bottom:8%;z-index:70;border:0;cursor:pointer;padding:2.2vmin 8vmin;border-radius:99px;
-    font-size:min(6vmin,30px);font-weight:900;letter-spacing:.14em;color:#fff;
-    background:linear-gradient(#ff6a4d,#e23a28 55%,#a81d10);
-    box-shadow:0 1.4vmin 0 #7a1409,0 2.4vmin 3vmin rgba(226,58,40,.5),inset 0 .6vmin .4vmin rgba(255,255,255,.4);
-    text-shadow:0 .3vmin 0 rgba(0,0,0,.35);animation:pushpulse 1.3s ease-in-out infinite;}
-  @keyframes pushpulse{50%{transform:scale(1.05)}}
-  .bigbtn:active{transform:translateY(1.2vmin) scale(.98);box-shadow:0 .2vmin 0 #7a1409,inset 0 .6vmin .4vmin rgba(255,255,255,.4)}
-  .bigbtn.hide{display:none}
-  #caption{position:absolute;bottom:20%;z-index:65;color:#ffe9a8;text-align:center;font-size:min(4.6vmin,22px);
-    font-weight:800;letter-spacing:.08em;text-shadow:0 .3vmin .6vmin rgba(0,0,0,.6);animation:capfade 1.8s ease-in-out infinite;}
-  @keyframes capfade{50%{opacity:.55}}
-  #caption.hide{display:none}
   #result{position:absolute;bottom:7%;z-index:65;text-align:center;opacity:0;pointer-events:none;}
   #result.show{opacity:1;transition:opacity .5s .3s;pointer-events:auto;}
-  #result .big{font-size:min(6vmin,30px);font-weight:900;color:#fff6c4;letter-spacing:.06em;
-    text-shadow:0 0 3vmin #ffb800,0 .4vmin 0 #7a4a00;}
-  #result .sub{margin-top:.6vmin;font-size:min(3.8vmin,18px);color:#ffe9a8;font-weight:700;opacity:.9;}
-  #replay{margin-top:2vmin;border:0;cursor:pointer;padding:1.4vmin 5vmin;border-radius:99px;font-size:min(4.4vmin,20px);
+  #result .sub{font-size:min(4vmin,19px);color:#ffe9a8;font-weight:800;text-shadow:0 .3vmin .6vmin rgba(0,0,0,.6);letter-spacing:.04em;}
+  #replay{margin-top:1.6vmin;border:0;cursor:pointer;padding:1.4vmin 5vmin;border-radius:99px;font-size:min(4.4vmin,20px);
     font-weight:900;letter-spacing:.1em;color:#5a2600;background:linear-gradient(#fff2b0,#ffd23f 60%,#e0a012);
     box-shadow:0 .8vmin 0 #a86c14,inset 0 .4vmin .3vmin rgba(255,255,255,.6);}
   #replay:active{transform:translateY(.6vmin);box-shadow:0 .2vmin 0 #a86c14}
-  #sound{position:absolute;top:2.4vmin;right:2.4vmin;z-index:80;border:0;cursor:pointer;width:8vmin;max-width:44px;
-    height:8vmin;max-height:44px;border-radius:50%;background:rgba(255,240,190,.14);color:#ffe9a8;font-size:min(4.4vmin,20px);
+  #sound{position:absolute;top:2.4vmin;right:2.4vmin;z-index:80;border:0;cursor:pointer;width:8vmin;max-width:44px;height:8vmin;
+    max-height:44px;border-radius:50%;background:rgba(255,240,190,.14);color:#ffe9a8;font-size:min(4.4vmin,20px);
     box-shadow:inset 0 0 0 .3vmin rgba(255,240,190,.35);}
-  @media (prefers-reduced-motion: reduce){.rays,.aura,.bigbtn,.rcard .rinner::after{animation:none !important}}
+  @media (prefers-reduced-motion: reduce){.rays,.aura,.reel-shine{animation:none !important}}
 </style>
 
 </head><body><div id="stage">
   <div class="rays"></div><div class="rays b"></div><div class="vignette"></div>
-  <div id="shock"></div>
-  <div id="banner"></div>
+  <div id="shock" class="go"></div>
 
-  <!-- Roulette -->
-  <div id="roulette">
-    <div class="machine">
+  <!-- dialogue -->
+  <div id="dialogue" class=""><div id="dlgText">まりな社長は<br>爆買カードを　手に入れた！</div><div class="hint">タップ</div><div class="adv">▽</div></div>
+
+  <!-- roulette -->
+  <div id="roulette" class="">
+    <div class="pill">
+      <span class="leg l"></span><span class="leg r"></span>
       <div class="reel-window">
-        <div id="strip" style="transform: translateY(0px);"><div class="tile" style="height: 114px;"><span class="dot"></span>新築物件</div><div class="tile" style="height: 114px;"><span class="dot"></span>目的地到着</div><div class="tile bonbi" style="height: 114px;"><span class="dot"></span>キングボンビー</div><div class="tile" style="height: 114px;"><span class="dot"></span>高級物件</div><div class="tile" style="height: 114px;"><span class="dot"></span>特急周遊</div><div class="tile" style="height: 114px;"><span class="dot"></span>南の島</div><div class="tile" style="height: 114px;"><span class="dot"></span>金融資産</div><div class="tile" style="height: 114px;"><span class="dot"></span>一等地</div><div class="tile real" style="height: 114px;"><span class="dot"></span>★ リアルカード ★</div><div class="tile" style="height: 114px;"><span class="dot"></span>カード売り場</div><div class="tile" style="height: 114px;"><span class="dot"></span>高級寿司</div><div class="tile" style="height: 114px;"><span class="dot"></span>世界一周旅行</div><div class="tile" style="height: 114px;"><span class="dot"></span>新築物件</div><div class="tile" style="height: 114px;"><span class="dot"></span>目的地到着</div><div class="tile bonbi" style="height: 114px;"><span class="dot"></span>キングボンビー</div><div class="tile" style="height: 114px;"><span class="dot"></span>高級物件</div><div class="tile" style="height: 114px;"><span class="dot"></span>特急周遊</div><div class="tile" style="height: 114px;"><span class="dot"></span>南の島</div><div class="tile" style="height: 114px;"><span class="dot"></span>金融資産</div><div class="tile" style="height: 114px;"><span class="dot"></span>一等地</div><div class="tile real" style="height: 114px;"><span class="dot"></span>★ リアルカード ★</div><div class="tile" style="height: 114px;"><span class="dot"></span>カード売り場</div><div class="tile" style="height: 114px;"><span class="dot"></span>高級寿司</div><div class="tile" style="height: 114px;"><span class="dot"></span>世界一周旅行</div><div class="tile" style="height: 114px;"><span class="dot"></span>新築物件</div><div class="tile" style="height: 114px;"><span class="dot"></span>目的地到着</div><div class="tile bonbi" style="height: 114px;"><span class="dot"></span>キングボンビー</div><div class="tile" style="height: 114px;"><span class="dot"></span>高級物件</div><div class="tile" style="height: 114px;"><span class="dot"></span>特急周遊</div><div class="tile" style="height: 114px;"><span class="dot"></span>南の島</div><div class="tile" style="height: 114px;"><span class="dot"></span>金融資産</div><div class="tile" style="height: 114px;"><span class="dot"></span>一等地</div><div class="tile real" style="height: 114px;"><span class="dot"></span>★ リアルカード ★</div><div class="tile" style="height: 114px;"><span class="dot"></span>カード売り場</div><div class="tile" style="height: 114px;"><span class="dot"></span>高級寿司</div><div class="tile" style="height: 114px;"><span class="dot"></span>世界一周旅行</div><div class="tile" style="height: 114px;"><span class="dot"></span>新築物件</div><div class="tile" style="height: 114px;"><span class="dot"></span>目的地到着</div><div class="tile bonbi" style="height: 114px;"><span class="dot"></span>キングボンビー</div><div class="tile" style="height: 114px;"><span class="dot"></span>高級物件</div><div class="tile" style="height: 114px;"><span class="dot"></span>特急周遊</div><div class="tile" style="height: 114px;"><span class="dot"></span>南の島</div><div class="tile" style="height: 114px;"><span class="dot"></span>金融資産</div><div class="tile" style="height: 114px;"><span class="dot"></span>一等地</div><div class="tile real" style="height: 114px;"><span class="dot"></span>★ リアルカード ★</div><div class="tile" style="height: 114px;"><span class="dot"></span>カード売り場</div><div class="tile" style="height: 114px;"><span class="dot"></span>高級寿司</div><div class="tile" style="height: 114px;"><span class="dot"></span>世界一周旅行</div><div class="tile" style="height: 114px;"><span class="dot"></span>新築物件</div><div class="tile" style="height: 114px;"><span class="dot"></span>目的地到着</div><div class="tile bonbi" style="height: 114px;"><span class="dot"></span>キングボンビー</div><div class="tile" style="height: 114px;"><span class="dot"></span>高級物件</div><div class="tile" style="height: 114px;"><span class="dot"></span>特急周遊</div><div class="tile" style="height: 114px;"><span class="dot"></span>南の島</div><div class="tile" style="height: 114px;"><span class="dot"></span>金融資産</div><div class="tile" style="height: 114px;"><span class="dot"></span>一等地</div><div class="tile real" style="height: 114px;"><span class="dot"></span>★ リアルカード ★</div><div class="tile" style="height: 114px;"><span class="dot"></span>カード売り場</div><div class="tile" style="height: 114px;"><span class="dot"></span>高級寿司</div><div class="tile" style="height: 114px;"><span class="dot"></span>世界一周旅行</div><div class="tile" style="height: 114px;"><span class="dot"></span>新築物件</div><div class="tile" style="height: 114px;"><span class="dot"></span>目的地到着</div><div class="tile bonbi" style="height: 114px;"><span class="dot"></span>キングボンビー</div><div class="tile" style="height: 114px;"><span class="dot"></span>高級物件</div><div class="tile" style="height: 114px;"><span class="dot"></span>特急周遊</div><div class="tile" style="height: 114px;"><span class="dot"></span>南の島</div><div class="tile" style="height: 114px;"><span class="dot"></span>金融資産</div><div class="tile" style="height: 114px;"><span class="dot"></span>一等地</div><div class="tile real" style="height: 114px;"><span class="dot"></span>★ リアルカード ★</div><div class="tile" style="height: 114px;"><span class="dot"></span>カード売り場</div><div class="tile" style="height: 114px;"><span class="dot"></span>高級寿司</div><div class="tile" style="height: 114px;"><span class="dot"></span>世界一周旅行</div><div class="tile" style="height: 114px;"><span class="dot"></span>新築物件</div><div class="tile" style="height: 114px;"><span class="dot"></span>目的地到着</div><div class="tile bonbi" style="height: 114px;"><span class="dot"></span>キングボンビー</div><div class="tile" style="height: 114px;"><span class="dot"></span>高級物件</div><div class="tile" style="height: 114px;"><span class="dot"></span>特急周遊</div><div class="tile" style="height: 114px;"><span class="dot"></span>南の島</div><div class="tile" style="height: 114px;"><span class="dot"></span>金融資産</div><div class="tile" style="height: 114px;"><span class="dot"></span>一等地</div><div class="tile real" style="height: 114px;"><span class="dot"></span>★ リアルカード ★</div><div class="tile" style="height: 114px;"><span class="dot"></span>カード売り場</div><div class="tile" style="height: 114px;"><span class="dot"></span>高級寿司</div><div class="tile" style="height: 114px;"><span class="dot"></span>世界一周旅行</div><div class="tile" style="height: 114px;"><span class="dot"></span>新築物件</div><div class="tile" style="height: 114px;"><span class="dot"></span>目的地到着</div><div class="tile bonbi" style="height: 114px;"><span class="dot"></span>キングボンビー</div><div class="tile" style="height: 114px;"><span class="dot"></span>高級物件</div><div class="tile" style="height: 114px;"><span class="dot"></span>特急周遊</div><div class="tile" style="height: 114px;"><span class="dot"></span>南の島</div><div class="tile" style="height: 114px;"><span class="dot"></span>金融資産</div><div class="tile" style="height: 114px;"><span class="dot"></span>一等地</div><div class="tile real" style="height: 114px;"><span class="dot"></span>★ リアルカード ★</div><div class="tile" style="height: 114px;"><span class="dot"></span>カード売り場</div><div class="tile" style="height: 114px;"><span class="dot"></span>高級寿司</div><div class="tile" style="height: 114px;"><span class="dot"></span>世界一周旅行</div></div>
-        <div class="reel-hi"></div>
+        <div id="strip" style="transform: translateY(-3350px);"><div class="tile" style="height: 50px;">新築物件</div><div class="tile" style="height: 50px;">目的地到着</div><div class="tile bonbi" style="height: 50px;">キングボンビー</div><div class="tile" style="height: 50px;">高級物件</div><div class="tile" style="height: 50px;">特急周遊</div><div class="tile" style="height: 50px;">南の島</div><div class="tile" style="height: 50px;">金融資産</div><div class="tile" style="height: 50px;">新築物件</div><div class="tile win" style="height: 50px;">爆買カード</div><div class="tile" style="height: 50px;">世界一周旅行</div><div class="tile" style="height: 50px;">カード売り場</div><div class="tile" style="height: 50px;">高級寿司</div><div class="tile" style="height: 50px;">新築物件</div><div class="tile" style="height: 50px;">目的地到着</div><div class="tile bonbi" style="height: 50px;">キングボンビー</div><div class="tile" style="height: 50px;">高級物件</div><div class="tile" style="height: 50px;">特急周遊</div><div class="tile" style="height: 50px;">南の島</div><div class="tile" style="height: 50px;">金融資産</div><div class="tile" style="height: 50px;">新築物件</div><div class="tile win" style="height: 50px;">爆買カード</div><div class="tile" style="height: 50px;">世界一周旅行</div><div class="tile" style="height: 50px;">カード売り場</div><div class="tile" style="height: 50px;">高級寿司</div><div class="tile" style="height: 50px;">新築物件</div><div class="tile" style="height: 50px;">目的地到着</div><div class="tile bonbi" style="height: 50px;">キングボンビー</div><div class="tile" style="height: 50px;">高級物件</div><div class="tile" style="height: 50px;">特急周遊</div><div class="tile" style="height: 50px;">南の島</div><div class="tile" style="height: 50px;">金融資産</div><div class="tile" style="height: 50px;">新築物件</div><div class="tile win" style="height: 50px;">爆買カード</div><div class="tile" style="height: 50px;">世界一周旅行</div><div class="tile" style="height: 50px;">カード売り場</div><div class="tile" style="height: 50px;">高級寿司</div><div class="tile" style="height: 50px;">新築物件</div><div class="tile" style="height: 50px;">目的地到着</div><div class="tile bonbi" style="height: 50px;">キングボンビー</div><div class="tile" style="height: 50px;">高級物件</div><div class="tile" style="height: 50px;">特急周遊</div><div class="tile" style="height: 50px;">南の島</div><div class="tile" style="height: 50px;">金融資産</div><div class="tile" style="height: 50px;">新築物件</div><div class="tile win" style="height: 50px;">爆買カード</div><div class="tile" style="height: 50px;">世界一周旅行</div><div class="tile" style="height: 50px;">カード売り場</div><div class="tile" style="height: 50px;">高級寿司</div><div class="tile" style="height: 50px;">新築物件</div><div class="tile" style="height: 50px;">目的地到着</div><div class="tile bonbi" style="height: 50px;">キングボンビー</div><div class="tile" style="height: 50px;">高級物件</div><div class="tile" style="height: 50px;">特急周遊</div><div class="tile" style="height: 50px;">南の島</div><div class="tile" style="height: 50px;">金融資産</div><div class="tile" style="height: 50px;">新築物件</div><div class="tile win" style="height: 50px;">爆買カード</div><div class="tile" style="height: 50px;">世界一周旅行</div><div class="tile" style="height: 50px;">カード売り場</div><div class="tile" style="height: 50px;">高級寿司</div><div class="tile" style="height: 50px;">新築物件</div><div class="tile" style="height: 50px;">目的地到着</div><div class="tile bonbi" style="height: 50px;">キングボンビー</div><div class="tile" style="height: 50px;">高級物件</div><div class="tile" style="height: 50px;">特急周遊</div><div class="tile" style="height: 50px;">南の島</div><div class="tile" style="height: 50px;">金融資産</div><div class="tile" style="height: 50px;">新築物件</div><div class="tile win" style="height: 50px;">爆買カード</div><div class="tile" style="height: 50px;">世界一周旅行</div><div class="tile" style="height: 50px;">カード売り場</div><div class="tile" style="height: 50px;">高級寿司</div><div class="tile" style="height: 50px;">新築物件</div><div class="tile" style="height: 50px;">目的地到着</div><div class="tile bonbi" style="height: 50px;">キングボンビー</div><div class="tile" style="height: 50px;">高級物件</div><div class="tile" style="height: 50px;">特急周遊</div><div class="tile" style="height: 50px;">南の島</div><div class="tile" style="height: 50px;">金融資産</div><div class="tile" style="height: 50px;">新築物件</div><div class="tile win" style="height: 50px;">爆買カード</div><div class="tile" style="height: 50px;">世界一周旅行</div><div class="tile" style="height: 50px;">カード売り場</div><div class="tile" style="height: 50px;">高級寿司</div><div class="tile" style="height: 50px;">新築物件</div><div class="tile" style="height: 50px;">目的地到着</div><div class="tile bonbi" style="height: 50px;">キングボンビー</div><div class="tile" style="height: 50px;">高級物件</div><div class="tile" style="height: 50px;">特急周遊</div><div class="tile" style="height: 50px;">南の島</div><div class="tile" style="height: 50px;">金融資産</div><div class="tile" style="height: 50px;">新築物件</div><div class="tile win" style="height: 50px;">爆買カード</div><div class="tile" style="height: 50px;">世界一周旅行</div><div class="tile" style="height: 50px;">カード売り場</div><div class="tile" style="height: 50px;">高級寿司</div></div>
+        <div class="reel-hi win"></div>
         <div class="reel-mask top"></div><div class="reel-mask bot"></div>
-        <div class="reel-arrow l">▶</div><div class="reel-arrow r">◀</div>
+        <div class="reel-shine"></div>
       </div>
     </div>
   </div>
 
-  <!-- Opener: real card (back) -> flip -> 爆買 card (front) -->
-  <div id="opener">
+  <!-- カード獲得！ -->
+  <div id="getBanner" class="show">カード獲得！</div>
+
+  <!-- 爆買 card -->
+  <div id="opener" class="show idle">
     <div class="aura"></div><div class="aura b"></div>
-    <div id="flip">
-      <!-- back = リアルカード -->
-      <div class="face back">
-        <div class="rcard oct">
-          <div class="rframe oct">
-            <div class="rinner oct">
-              <div class="rlabel">リアルカード</div>
-              <div class="medal">¥</div>
-              <div class="rsub">PREMIUM</div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <!-- front = 爆買カード -->
-      <div class="face front">
-        <div class="card oct">
-          <div class="frame oct">
-            <div class="inner oct">
-              <div class="bgcoin" style="width:14%;height:14%;left:8%;top:14%"></div>
-              <div class="bgcoin" style="width:11%;height:11%;left:78%;top:20%"></div>
-              <div class="bgcoin" style="width:16%;height:16%;left:70%;top:60%"></div>
-              <div class="bgcoin" style="width:12%;height:12%;left:12%;top:66%"></div>
-              <div class="bgcoin" style="width:9%;height:9%;left:44%;top:8%"></div>
-              <div class="kanji top" data-c="爆">爆</div><div class="furi top">ばく</div>
-              <svg id="mascot" viewBox="0 0 200 210" aria-label="爆買カードのマスコット">
-                <defs>
-                  <radialgradient id="body" cx="42%" cy="34%" r="70%">
-                    <stop offset="0" stop-color="#fffaf0"></stop><stop offset="60%" stop-color="#fff3d6"></stop><stop offset="100%" stop-color="#f0dca6"></stop>
-                  </radialgradient>
-                  <radialgradient id="coinG" cx="35%" cy="30%" r="75%">
-                    <stop offset="0" stop-color="#fff6c4"></stop><stop offset="55%" stop-color="#ffd23f"></stop><stop offset="100%" stop-color="#c98a1c"></stop>
-                  </radialgradient>
-                </defs>
-                <path d="M100 40 C92 20 106 12 120 16 C112 26 116 36 100 40Z" fill="#8ec06a" stroke="#4f7a34" stroke-width="2"></path>
-                <path d="M100 40 C86 24 70 30 72 44 C86 40 92 44 100 40Z" fill="#a6d47f" stroke="#4f7a34" stroke-width="2"></path>
-                <circle cx="99" cy="42" r="6" fill="#E23A28"></circle>
-                <path d="M99 42 L82 34 L86 50 Z" fill="#E23A28"></path><path d="M99 42 L116 34 L112 50 Z" fill="#E23A28"></path>
-                <ellipse cx="78" cy="196" rx="16" ry="10" fill="#f0dca6"></ellipse><ellipse cx="122" cy="196" rx="16" ry="10" fill="#f0dca6"></ellipse>
-                <ellipse cx="100" cy="130" rx="70" ry="62" fill="url(#body)" stroke="#d9bd7e" stroke-width="2.5"></ellipse>
-                <path d="M40 128 q-16 8 -14 26 q10 4 20 -6 Z" fill="url(#body)" stroke="#d9bd7e" stroke-width="2.5"></path>
-                <path d="M160 118 q18 -6 22 -22 q-12 -6 -24 8 Z" fill="url(#body)" stroke="#d9bd7e" stroke-width="2.5"></path>
-                <g class="coin-spin">
-                  <circle cx="176" cy="86" r="22" fill="url(#coinG)" stroke="#b57a10" stroke-width="3"></circle>
-                  <circle cx="176" cy="86" r="15" fill="none" stroke="#e0a012" stroke-width="2"></circle>
-                  <text x="176" y="95" text-anchor="middle" font-size="20" font-weight="900" fill="#7a4a00">¥</text>
-                </g>
-                <ellipse cx="64" cy="132" rx="13" ry="9" fill="#FF9AA2" opacity=".8"></ellipse>
-                <ellipse cx="136" cy="132" rx="13" ry="9" fill="#FF9AA2" opacity=".8"></ellipse>
-                <path d="M60 116 q10 -12 22 0" fill="none" stroke="#3a2410" stroke-width="5" stroke-linecap="round"></path>
-                <ellipse cx="122" cy="114" rx="8" ry="10" fill="#3a2410"></ellipse><circle cx="119" cy="110" r="3" fill="#fff"></circle>
-                <path d="M84 140 q16 20 34 0" fill="none" stroke="#3a2410" stroke-width="5" stroke-linecap="round"></path>
-              </svg>
-              <div class="kanji bot" data-c="買">買</div><div class="furi bot">がい</div>
-              <div class="glint" style="left:6%;top:8%;font-size:5vmin">✦</div>
-              <div class="glint" style="right:8%;top:12%;font-size:4vmin;animation-delay:.6s">✦</div>
-              <div class="glint" style="left:10%;bottom:14%;font-size:3.4vmin;animation-delay:1.1s">✦</div>
-              <div class="glint" style="right:12%;bottom:10%;font-size:4.4vmin;animation-delay:.3s">✦</div>
-            </div>
-          </div>
+    <div class="card oct">
+      <div class="frame oct">
+        <div class="inner oct">
+          <div class="bgcoin" style="width:14%;height:14%;left:8%;top:14%"></div>
+          <div class="bgcoin" style="width:11%;height:11%;left:78%;top:20%"></div>
+          <div class="bgcoin" style="width:16%;height:16%;left:70%;top:60%"></div>
+          <div class="bgcoin" style="width:12%;height:12%;left:12%;top:66%"></div>
+          <div class="bgcoin" style="width:9%;height:9%;left:44%;top:8%"></div>
+          <div class="kanji top" data-c="爆">爆</div><div class="furi top">ばく</div>
+          <svg id="mascot" viewBox="0 0 200 210" aria-label="爆買カードのマスコット">
+            <defs>
+              <radialgradient id="body" cx="42%" cy="34%" r="70%">
+                <stop offset="0" stop-color="#fffaf0"></stop><stop offset="60%" stop-color="#fff3d6"></stop><stop offset="100%" stop-color="#f0dca6"></stop>
+              </radialgradient>
+              <radialgradient id="coinG" cx="35%" cy="30%" r="75%">
+                <stop offset="0" stop-color="#fff6c4"></stop><stop offset="55%" stop-color="#ffd23f"></stop><stop offset="100%" stop-color="#c98a1c"></stop>
+              </radialgradient>
+            </defs>
+            <path d="M100 40 C92 20 106 12 120 16 C112 26 116 36 100 40Z" fill="#8ec06a" stroke="#4f7a34" stroke-width="2"></path>
+            <path d="M100 40 C86 24 70 30 72 44 C86 40 92 44 100 40Z" fill="#a6d47f" stroke="#4f7a34" stroke-width="2"></path>
+            <circle cx="99" cy="42" r="6" fill="#E23A28"></circle>
+            <path d="M99 42 L82 34 L86 50 Z" fill="#E23A28"></path><path d="M99 42 L116 34 L112 50 Z" fill="#E23A28"></path>
+            <ellipse cx="78" cy="196" rx="16" ry="10" fill="#f0dca6"></ellipse><ellipse cx="122" cy="196" rx="16" ry="10" fill="#f0dca6"></ellipse>
+            <ellipse cx="100" cy="130" rx="70" ry="62" fill="url(#body)" stroke="#d9bd7e" stroke-width="2.5"></ellipse>
+            <path d="M40 128 q-16 8 -14 26 q10 4 20 -6 Z" fill="url(#body)" stroke="#d9bd7e" stroke-width="2.5"></path>
+            <path d="M160 118 q18 -6 22 -22 q-12 -6 -24 8 Z" fill="url(#body)" stroke="#d9bd7e" stroke-width="2.5"></path>
+            <g class="coin-spin">
+              <circle cx="176" cy="86" r="22" fill="url(#coinG)" stroke="#b57a10" stroke-width="3"></circle>
+              <circle cx="176" cy="86" r="15" fill="none" stroke="#e0a012" stroke-width="2"></circle>
+              <text x="176" y="95" text-anchor="middle" font-size="20" font-weight="900" fill="#7a4a00">¥</text>
+            </g>
+            <ellipse cx="64" cy="132" rx="13" ry="9" fill="#FF9AA2" opacity=".8"></ellipse><ellipse cx="136" cy="132" rx="13" ry="9" fill="#FF9AA2" opacity=".8"></ellipse>
+            <path d="M60 116 q10 -12 22 0" fill="none" stroke="#3a2410" stroke-width="5" stroke-linecap="round"></path>
+            <ellipse cx="122" cy="114" rx="8" ry="10" fill="#3a2410"></ellipse><circle cx="119" cy="110" r="3" fill="#fff"></circle>
+            <path d="M84 140 q16 20 34 0" fill="none" stroke="#3a2410" stroke-width="5" stroke-linecap="round"></path>
+          </svg>
+          <div class="kanji bot" data-c="買">買</div><div class="furi bot">がい</div>
+          <div class="glint" style="left:6%;top:8%;font-size:5vmin">✦</div>
+          <div class="glint" style="right:8%;top:12%;font-size:4vmin;animation-delay:.6s">✦</div>
+          <div class="glint" style="left:10%;bottom:14%;font-size:3.4vmin;animation-delay:1.1s">✦</div>
+          <div class="glint" style="right:12%;bottom:10%;font-size:4.4vmin;animation-delay:.3s">✦</div>
         </div>
       </div>
     </div>
   </div>
 
-  <div id="kakutei">確定!!</div>
-  <div id="fx"></div>
+  <div id="fx"><div class="raincoin" style="left: 7.06454%;">¥</div><div class="raincoin" style="left: 0.141362%;">円</div><div class="raincoin" style="left: 74.6333%;">¥</div><div class="raincoin" style="left: 50.8056%;">¥</div><div class="raincoin" style="left: 35.7039%;">¥</div><div class="raincoin" style="left: 15.6098%;">¥</div><div class="spark" style="left: 600.95px; top: 688.851px;"></div><div class="raincoin" style="left: 70.1865%;">円</div><div class="spark" style="left: 637.706px; top: 483.646px;"></div><div class="raincoin" style="left: 28.638%;">¥</div><div class="spark" style="left: 773.156px; top: 339.326px;"></div></div>
 
-  <div id="caption">▼ ボタンを押して回せ ▼</div>
-  <button id="spin" class="bigbtn">SPIN</button>
-
-  <div id="result">
-    <div class="big">爆買カード ＧＥＴ！！</div>
+  <div id="result" class="show">
     <div class="sub">なんでも買える権利、確定。</div>
     <button id="replay">もう一度</button>
   </div>
 
   <button id="sound" title="音のオン/オフ">🔊</button>
-<div id="flash"></div></div>
+<div id="flash" class="boom"></div></div>
 
 <script>
 (function(){
   const $=s=>document.querySelector(s);
   const stage=$('#stage'), strip=$('#strip'), reelWin=$('.reel-window'), reelHi=$('.reel-hi'),
-        roulette=$('#roulette'), opener=$('#opener'), flip=$('#flip'), back=$('.face.back'),
-        banner=$('#banner'), shock=$('#shock'), kt=$('#kakutei'), fx=$('#fx'),
-        spinBtn=$('#spin'), caption=$('#caption'), result=$('#result'), soundBtn=$('#sound');
+        roulette=$('#roulette'), dialogue=$('#dialogue'), dlgText=$('#dlgText'),
+        getBanner=$('#getBanner'), opener=$('#opener'), shock=$('#shock'), fx=$('#fx'),
+        result=$('#result'), soundBtn=$('#sound');
   let flash=$('#flash'); if(!flash){flash=document.createElement('div');flash.id='flash';stage.appendChild(flash);}
   const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
-  let busy=false, curY=0, h=0, winH=0, rainTimer=null, sparkTimer=null, tickTimer=null, soundOn=true, canOpen=false;
+  let state='intro', curY=0, h=0, winH=0, rainTimer=null, sparkTimer=null, tickTimer=null, soundOn=true;
 
-  /* reel content — 初期表示の3枠: 上=新築物件 / 中=目的地到着 / 下=キングボンビー */
-  const cycle=['新築物件','目的地到着','キングボンビー','高級物件','特急周遊','南の島','金融資産','一等地','リアルカード','カード売り場','高級寿司','世界一周旅行'];
+  const INTRO='まりな社長！　ここは<br>カードが　もらえる駅ですぞ！';
+  const RESULT='まりな社長は<br>爆買カードを　手に入れた！';
+
+  /* reel content — 初期3枠: 上=新築物件 / 中=目的地到着 / 下=キングボンビー、当選=爆買カード */
+  const WIN='爆買カード';
+  const cycle=['新築物件','目的地到着','キングボンビー','高級物件','特急周遊','南の島','金融資産','新築物件',WIN,'世界一周旅行','カード売り場','高級寿司'];
   const CYCLE=cycle.length, COPIES=8;
-  const REALPOS=cycle.indexOf('リアルカード');
-  const START=1;                              // 中央枠の初期index -> 上0/中1/下2 を表示
-  const TARGET=5*CYCLE+REALPOS;               // リアルカードに着地
+  const REALPOS=cycle.indexOf(WIN);
+  const START=1;
+  const TARGET=5*CYCLE+REALPOS;
 
   function buildReel(){
     let html='';
-    for(let c=0;c<COPIES;c++){
-      for(let i=0;i<CYCLE;i++){
-        const label=cycle[i];
-        const real=(label==='リアルカード'), bonbi=(label==='キングボンビー');
-        const cls=real?' real':(bonbi?' bonbi':'');
-        html+=`<div class="tile${cls}"><span class="dot"></span>${real?'★ リアルカード ★':label}</div>`;
-      }
-    }
+    for(let c=0;c<COPIES;c++){ for(let i=0;i<CYCLE;i++){
+      const label=cycle[i], win=(label===WIN), bonbi=(label==='キングボンビー');
+      const cls=win?' win':(bonbi?' bonbi':'');
+      html+=`<div class="tile${cls}">${label}</div>`;
+    }}
     strip.innerHTML=html;
   }
   function layout(){
@@ -343,24 +279,24 @@
     const a=strip.animate([{transform:`translateY(${curY}px)`},{transform:`translateY(${y}px)`}],{duration:dur,easing:ease});
     a.onfinish=()=>{setY(y);res();};
   });}
-  const wait=ms=>new Promise(r=>setTimeout(r,ms));
 
-  /* ---- audio ---- */
+  /* audio */
   let ac=null;
   function AC(){ if(!ac){try{ac=new (window.AudioContext||window.webkitAudioContext)();}catch(e){}} if(ac&&ac.state==='suspended')ac.resume(); return ac; }
   function tone(f0,f1,t,type,g){ const c=AC(); if(!c||!soundOn)return; const o=c.createOscillator(),ga=c.createGain();
-    o.type=type||'sawtooth'; o.frequency.setValueAtTime(f0,c.currentTime);
-    o.frequency.exponentialRampToValueAtTime(Math.max(1,f1),c.currentTime+t);
+    o.type=type||'sawtooth'; o.frequency.setValueAtTime(f0,c.currentTime); o.frequency.exponentialRampToValueAtTime(Math.max(1,f1),c.currentTime+t);
     ga.gain.setValueAtTime(.0001,c.currentTime); ga.gain.exponentialRampToValueAtTime(g||.2,c.currentTime+.02);
     ga.gain.exponentialRampToValueAtTime(.0001,c.currentTime+t); o.connect(ga).connect(c.destination); o.start(); o.stop(c.currentTime+t); }
   function noise(t,g){ const c=AC(); if(!c||!soundOn)return; const b=c.createBuffer(1,c.sampleRate*t,c.sampleRate),d=b.getChannelData(0);
     for(let i=0;i<d.length;i++)d[i]=(Math.random()*2-1)*(1-i/d.length); const s=c.createBufferSource();s.buffer=b;
     const ga=c.createGain();ga.gain.value=g||.4;s.connect(ga).connect(c.destination);s.start(); }
   function chime(){ [523,659,784,1046].forEach((f,i)=>setTimeout(()=>tone(f,f,.5,'triangle',.22),i*70)); }
+  function ding(){ tone(880,1320,.35,'triangle',.2); setTimeout(()=>tone(1320,1320,.28,'triangle',.16),120); }
+  function blip(){ tone(600,900,.1,'square',.12); }
   function startTicks(){ tickTimer=setInterval(()=>tone(1300,1300,.03,'square',.06),85); }
   function stopTicks(){ clearInterval(tickTimer); }
 
-  /* ---- particles ---- */
+  /* particles */
   function burst(){
     const r=stage.getBoundingClientRect(), cx=r.width/2, cy=r.height/2, n=reduce?18:56;
     for(let i=0;i<n;i++){
@@ -390,61 +326,46 @@
   function shakeScreen(){ if(reduce)return; stage.animate([
     {transform:'translate(0,0)'},{transform:'translate(-1.2vmin,.8vmin)'},{transform:'translate(1vmin,-.6vmin)'},
     {transform:'translate(-.8vmin,.4vmin)'},{transform:'translate(0,0)'}],{duration:400,easing:'ease-out'}); }
-  function showBanner(txt){ banner.textContent=txt; banner.classList.remove('show'); void banner.offsetWidth; banner.classList.add('show'); }
 
-  /* ---- sequence ---- */
-  async function spin(){
-    if(busy)return; busy=true; AC();
-    spinBtn.classList.add('hide'); caption.classList.add('hide');
-    startTicks();
-    await animateTo(centerY(TARGET), reduce?800:3200, 'cubic-bezier(.1,.72,.12,1)');
-    stopTicks();
-    land();
+  function showDialogue(html){ dlgText.innerHTML=html; dialogue.classList.remove('show'); void dialogue.offsetWidth; dialogue.classList.add('show'); }
+
+  /* sequence */
+  function handleTap(){
+    if(state==='intro'){ AC(); blip(); dialogue.classList.remove('show'); state='spinning'; startSpin(); }
+    else if(state==='result'){ blip(); dialogue.classList.remove('show'); showAcquired(); }
   }
-
-  function land(){
-    reelHi.classList.add('win'); tone(880,1320,.35,'triangle',.2);
-    setTimeout(()=>showBanner('リアルカード 確定!!'), 200);
-    setTimeout(()=>{
-      roulette.classList.add('hide');
-      opener.classList.add('show');
-      flip.classList.add('pop'); tone(300,600,.25,'sine',.18);
-      canOpen=true;
-      // auto-open after a beat (or tap the card)
-      setTimeout(()=>{ if(canOpen) openCard(); }, reduce?500:1200);
-    }, 650);
+  async function startSpin(){
+    roulette.classList.add('show'); AC(); startTicks();
+    await animateTo(centerY(TARGET), reduce?800:3000, 'cubic-bezier(.1,.72,.12,1)');
+    stopTicks(); onLand();
   }
-
-  function openCard(){
-    if(!canOpen)return; canOpen=false;
-    flip.classList.remove('pop');
-    // 光の大爆発
-    flash.classList.add('boom'); shock.classList.add('go'); noise(.5,.5); tone(90,40,.5,'sine',.3);
-    burst(); shakeScreen();
-    // flip open
-    void flip.offsetWidth; flip.classList.add('open');
-    setTimeout(()=>{ opener.classList.add('revealed'); kt.classList.add('show'); chime(); }, 320);
-    setTimeout(()=>{ opener.classList.add('idle'); rainStart(); sparkleStart(); result.classList.add('show'); busy=false; }, 1250);
+  function onLand(){
+    reelHi.classList.add('win'); ding(); state='result';
+    setTimeout(()=>showDialogue(RESULT), reduce?300:800);
   }
-  // tap card to open immediately
-  opener.addEventListener('click',()=>{ if(canOpen) openCard(); });
-
+  function showAcquired(){
+    state='acquired';
+    roulette.classList.remove('show');
+    flash.classList.add('boom'); shock.classList.add('go'); noise(.5,.5); tone(90,40,.5,'sine',.3); burst(); shakeScreen();
+    getBanner.classList.add('show');
+    opener.classList.add('show');
+    setTimeout(()=>chime(),300);
+    setTimeout(()=>{ opener.classList.add('idle'); rainStart(); sparkleStart(); result.classList.add('show'); },1150);
+  }
   function reset(){
     clearInterval(rainTimer); clearInterval(sparkTimer); stopTicks(); fx.innerHTML='';
-    canOpen=false; busy=false;
-    flash.classList.remove('boom'); shock.classList.remove('go'); kt.classList.remove('show');
-    banner.classList.remove('show'); result.classList.remove('show'); reelHi.classList.remove('win');
-    opener.classList.remove('show','revealed','idle'); flip.classList.remove('pop','open');
-    roulette.classList.remove('hide');
-    caption.classList.remove('hide'); spinBtn.classList.remove('hide');
-    layout();
+    state='intro';
+    flash.classList.remove('boom'); shock.classList.remove('go'); reelHi.classList.remove('win');
+    getBanner.classList.remove('show'); result.classList.remove('show');
+    opener.classList.remove('show','idle'); roulette.classList.remove('show');
+    layout(); showDialogue(INTRO);
   }
 
-  buildReel(); layout();
-  window.addEventListener('resize',()=>{ if(!busy) layout(); });
-  spinBtn.addEventListener('click', spin);
-  $('#replay').addEventListener('click', reset);
-  soundBtn.addEventListener('click',()=>{ soundOn=!soundOn; soundBtn.textContent=soundOn?'🔊':'🔇'; if(soundOn)AC(); });
+  buildReel(); layout(); showDialogue(INTRO);
+  window.addEventListener('resize',()=>{ if(state==='intro'||state==='acquired') layout(); });
+  stage.addEventListener('click',e=>{ if(e.target.closest('#sound')||e.target.closest('#replay'))return; handleTap(); });
+  $('#replay').addEventListener('click',e=>{ e.stopPropagation(); reset(); });
+  soundBtn.addEventListener('click',e=>{ e.stopPropagation(); soundOn=!soundOn; soundBtn.textContent=soundOn?'🔊':'🔇'; if(soundOn)AC(); });
 })();
 </script>
 </body></html>
